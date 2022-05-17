@@ -7,20 +7,19 @@ import settings
 class GeoParser:
     def __init__(self, db: DB.DataBase):
         self.db = db
-        self.geo_table = self.db.get_table_by_name(settings.GEO_TABLE_NAME)
         self.street_kinds = self.extract_street_kinds()
 
     def extract_street_kinds(self) -> Set[str]:
         streets = self.db.get_entries_by_column(
-            self.geo_table,
-            settings.PARAM_NAMES.street,
+            settings.STREET_TABLE,
+            settings.GEO_PARAM_NAMES.street,
             settings.EXTRACT_STREET_KINDS_LIMIT
         )
         street_kinds = set()
 
         for street in streets:
             for word in re.split("[/. ]", street[0]):
-                if word and word[0].islower():
+                if word and word[0].islower(): # This is bad
                     street_kinds.add(word)
 
         return street_kinds
@@ -34,30 +33,36 @@ class GeoParser:
         for token in tokens:
             if token in self.street_kinds:
                 continue
-            if self.db.found_any_by_values(
-                    self.geo_table, {settings.PARAM_NAMES.city: token}
-            ):
-                city = token
-            elif self.db.found_any_by_values(
-                    self.geo_table, {settings.PARAM_NAMES.street: token}
-            ):
-                street = token
-            elif self.db.found_any_by_values(
-                    self.geo_table, {settings.PARAM_NAMES.house: token}
-            ):
+            if city is None:
+                city = self.db.filter_by_values(settings.CITY_TABLE, {
+                    settings.GEO_PARAM_NAMES.city: token})[0][1]
+                if city:
+                    continue
+            if street is None:
+                street = self.db.filter_by_values(settings.STREET_TABLE, {
+                    settings.GEO_PARAM_NAMES.street: token})
+                # Remove the index from here (i. e. change the filter method)
+                if street:
+                    street = street[0][1]
+                    continue
+            if token[0].isdigit():  # Regex needed
                 house = token
 
+        if city is None or street is None or house is None:
+            pass  # Wrong
+
         values = {
-            settings.PARAM_NAMES.city: city,
-            settings.PARAM_NAMES.street: street,
-            settings.PARAM_NAMES.house: house
+            settings.GEO_PARAM_NAMES.city: city,
+            settings.GEO_PARAM_NAMES.street: street,
+            settings.GEO_PARAM_NAMES.house: house
         }
-        return list(self.db.filter_by_values(self.geo_table, values))
+        return list(self.db.filter_by_values(settings.GEO_TABLE, values))
+        # sort by street kind (if specified) and housenumber
 
 
 if __name__ == "__main__":
-    db = DB.DataBase([settings.GEO_TABLE])
+    db = DB.DataBase([settings.GEO_TABLE, settings.CITY_TABLE,
+                      settings.STREET_TABLE])
     parser = GeoParser(db)
 
-    print(*parser.parse("Магнитогорск карла 174"), sep='\n')
-
+    print(*parser.parse("Екатеринбург Тургенева 4"), sep='\n')

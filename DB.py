@@ -24,11 +24,6 @@ class DataBase:
         if self.conn is not None:
             self.conn.close()
 
-    def get_table_by_name(self, name: str):
-        for table in self.tables:
-            if table.name == name:
-                return table
-
     def create_table(self, table: Table):
         """ Создание таблицы """
 
@@ -37,7 +32,10 @@ class DataBase:
 
         param_queries = []
         for param in table.params:
-            param_queries.append(f"""{param.name} {param.type}""")
+            param_query = f"{param.name} {param.type}"
+            if param.default is not None:
+                param_query += f" default {param.default}"
+            param_queries.append(param_query)
         query += ','.join(param_queries) + ')'
 
         self.cursor.execute(query)
@@ -47,15 +45,17 @@ class DataBase:
         """ Добавление записи в таблицу """
 
         query = f"""INSERT OR REPLACE INTO {table.name} 
-        VALUES({"?, " * (table.param_number - 1)}?)"""
+        VALUES({"?, " * (table.param_number)}?)"""
 
         self.cursor.executemany(query, entries)
         self.conn.commit()
 
-    def get_entries_by_column(self, table: Table, col: str, limit: int = None):
-        query = f"SELECT {col} FROM {table.name}"
+    def get_entries_by_column(self, table: Table, col: str, limit: int = None,
+                              distinct: bool = False):
+        query = f"SELECT {'DISTINCT' if distinct else ''}" \
+                f" {col} FROM {table.name}"
         if limit is not None:
-            query = f"SELECT {col} FROM {table.name} LIMIT {limit}"
+            query += f" LIMIT {limit}"
 
         return self.cursor.execute(query).fetchall()
 
@@ -74,10 +74,6 @@ class DataBase:
 
         self.cursor.execute(query)
         return self.cursor.fetchall()
-
-    def found_any_by_values(self, table: Table, values: Dict[str, str],
-                            ignore_case=True) -> bool:
-        return bool(self.filter_by_values(table, values, ignore_case))
 
 # if __name__ == "__main__":
 #     db = DataBase()

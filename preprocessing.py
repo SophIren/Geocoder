@@ -1,14 +1,13 @@
 import settings
 import osmium as o
 import DB
+from table import Table
 
 
 class AddressPreprocessor(o.SimpleHandler):
     def __init__(self, linked_nodes):
         super(AddressPreprocessor, self).__init__()
-        self.entries = []
-        self.cities = set()
-        self.streets = set()
+        self.geo_entries = []
         self.linked_nodes = linked_nodes
 
     def add_entry(self, obj, lat, lon):
@@ -18,9 +17,7 @@ class AddressPreprocessor(o.SimpleHandler):
                  obj.tags['addr:street'],
                  obj.tags['addr:housenumber'],
                  obj.tags.get('addr:postcode'))
-        self.entries.append(entry)
-        self.cities.add(obj.tags['addr:city'])
-        self.streets.add(obj.tags['addr:street'])
+        self.geo_entries.append(entry)
 
     def node(self, n):
         self.add_entry(n, n.location.lat, n.location.lon)
@@ -61,11 +58,13 @@ def prepare_addresses(addresses_data_path, linked_nodes):
     return address_handler
 
 
-def create_tables(entries):
-    db = DB.DataBase([settings.GEO_TABLE])
-    db.add_entries(settings.GEO_TABLE, entries)
-
-    db.close()
+def fill_secondary_table(db: DB.DataBase, take_from_col: str,
+                         save_to_table: Table):
+    distinct = db.get_entries_by_column(settings.GEO_TABLE,
+                                        take_from_col, distinct=True)
+    entries = [(str(i + 1), distinct[i][0]) for i in
+               range(len(distinct))]
+    db.add_entries(save_to_table, entries)
 
 
 def main():
@@ -77,7 +76,12 @@ def main():
                                         linked_nodes_handler.nodes)
 
     print('ADDING ENTRIES')
-    create_geo_table(address_handler.entries)
+    db = DB.DataBase([settings.GEO_TABLE, settings.CITY_TABLE,
+                      settings.STREET_TABLE])
+    db.add_entries(settings.GEO_TABLE, address_handler.geo_entries)
+    fill_secondary_table(db, settings.GEO_PARAM_NAMES.city, settings.CITY_TABLE)
+    fill_secondary_table(db, settings.GEO_PARAM_NAMES.street,
+                         settings.STREET_TABLE)
 
 
 if __name__ == '__main__':

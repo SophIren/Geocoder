@@ -1,17 +1,6 @@
+from param_name_list import GeoParamNameList
 from parameter import Parameter
 from table import Table
-
-
-class ParamNameList:
-    def __init__(self, lat: str, lon: str,
-                 city: str, street: str, house: str, postcode: str):
-        self.lat = lat
-        self.lon = lon
-        self.city = city
-        self.street = street
-        self.house = house
-        self.postcode = postcode
-
 
 LINKED_NODES_DATA_PATH = 'data/linked-nodes.osm.pbf'
 ADDRESSES_DATA_PATH = 'data/addresses.osm.pbf'
@@ -21,16 +10,18 @@ GEO_TABLE_NAME = 'geo'
 CITY_TABLE_NAME = 'cities'
 STREETS_TABLE_NAME = 'streets'
 
-PARAM_NAMES = ParamNameList('lat', 'lon', 'city', 'street',
-                            'housenumber', 'postcode')
-PARAMS = [Parameter(PARAM_NAMES.lat, 'real'),
-          Parameter(PARAM_NAMES.lon, 'real'),
-          Parameter(PARAM_NAMES.city, 'text'),
-          Parameter(PARAM_NAMES.street, 'text'),
-          Parameter(PARAM_NAMES.house, 'text'),
-          Parameter(PARAM_NAMES.postcode, 'int')]
-GEO_TABLE = Table(GEO_TABLE_NAME, PARAMS)
+GEO_PARAM_NAMES = GeoParamNameList('lat', 'lon', 'city', 'street',
+                                   'housenumber', 'postcode')
+GEO_PARAMS = [Parameter(GEO_PARAM_NAMES.lat, 'real'),
+              Parameter(GEO_PARAM_NAMES.lon, 'real'),
+              Parameter(GEO_PARAM_NAMES.city, 'text'),
+              Parameter(GEO_PARAM_NAMES.street, 'text'),
+              Parameter(GEO_PARAM_NAMES.house, 'text'),
+              Parameter(GEO_PARAM_NAMES.postcode, 'int', default='null')]
 
-
+GEO_TABLE = Table(GEO_TABLE_NAME, GEO_PARAMS)
+CITY_TABLE = Table(CITY_TABLE_NAME, [Parameter(GEO_PARAM_NAMES.city, 'text')])
+STREET_TABLE = Table(STREETS_TABLE_NAME,
+                     [Parameter(GEO_PARAM_NAMES.street, 'text')])
 
 EXTRACT_STREET_KINDS_LIMIT = 100000

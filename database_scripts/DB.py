@@ -1,6 +1,6 @@
 import sqlite3
 import settings
-from table import Table
+from database_scripts.table import Table
 from typing import List, Dict
 
 
@@ -76,5 +76,5 @@ class DataBase:
         return self.cursor.fetchall()
 
 # if __name__ == "__main__":
-#     db = DataBase()
-#     db.close()
+#     database_scripts = DataBase()
+#     database_scripts.close()

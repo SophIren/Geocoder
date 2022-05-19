@@ -1,7 +1,7 @@
 import settings
 import osmium as o
-import DB
-from table import Table
+from database_scripts import DB
+from database_scripts.table import Table
 
 
 class AddressPreprocessor(o.SimpleHandler):

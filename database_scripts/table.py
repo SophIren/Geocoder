@@ -1,5 +1,5 @@
 from typing import List
-from parameter import Parameter
+from database_scripts.parameter import Parameter
 
 
 class Table:

@@ -1,6 +1,6 @@
 import re
 from typing import Set
-import DB
+from database_scripts import DB
 import settings
 
 

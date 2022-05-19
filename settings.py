@@ -1,10 +1,15 @@
-from param_name_list import GeoParamNameList
-from parameter import Parameter
-from table import Table
+from database_scripts.param_name_list import GeoParamNameList
+from database_scripts.parameter import Parameter
+from database_scripts.table import Table
 
-LINKED_NODES_DATA_PATH = 'data/linked-nodes.osm.pbf'
-ADDRESSES_DATA_PATH = 'data/addresses.osm.pbf'
-DB_PATH = "data/geodatabase.db"
+import os
+
+
+'''Supposing main.py is run'''
+LINKED_NODES_DATA_PATH = os.path.abspath('data/linked-nodes.osm.pbf')
+ADDRESSES_DATA_PATH = os.path.abspath('data/addresses.osm.pbf')
+DB_PATH = os.path.abspath("data/geodatabase.db")
+GUI_PATH = os.path.abspath("gui/geocoder.ui")
 
 GEO_TABLE_NAME = 'geo'
 CITY_TABLE_NAME = 'cities'

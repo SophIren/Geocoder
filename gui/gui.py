@@ -1,27 +1,22 @@
 import sys
 from PyQt5 import uic
 from PyQt5.QtWidgets import *
-import DB
+from database_scripts import DB
 import settings
 from request_parsing import GeoParser
-from param_name_list import GeoParamNameList
+from database_scripts.param_name_list import GeoParamNameList
 from PyQt5 import QtCore
-
-
-def show_message_box(title, description, error_type):
-    msg = QMessageBox()
-    msg.setWindowTitle(title)
-    msg.setText(description)
-    msg.setIcon(error_type)
-
-    msg.exec_()
 
 
 class GeocoderView(QMainWindow):
     def __init__(self):
         super(GeocoderView, self).__init__()
-        uic.loadUi("geocoder.ui", self)
-        self.a = 0
+        uic.loadUi(settings.GUI_PATH, self)
+
+        self.db = DB.DataBase([settings.GEO_TABLE, settings.CITY_TABLE,
+                               settings.STREET_TABLE])
+        self.parser = GeoParser(self.db)
+
         self.find_button.clicked.connect(self.find)
         self.choose_button.clicked.connect(self.choose_address)
         self.selected_item_index = None
@@ -38,7 +33,7 @@ class GeocoderView(QMainWindow):
         if address == "":
             return
         try:
-            addresses = parser.parse(address)
+            addresses = self.parser.parse(address)
             if len(addresses) == 0:
                 show_message_box("Error", "Nothing found", QMessageBox.Warning)
         except IndexError:
@@ -49,7 +44,8 @@ class GeocoderView(QMainWindow):
         self.addresses = []
         for elem in addresses:
             self.addresses.append(
-                GeoParamNameList(lat=elem[1], lon=elem[2], city=elem[3], street=elem[4], house=elem[5],
+                GeoParamNameList(lat=elem[1], lon=elem[2], city=elem[3],
+                                 street=elem[4], house=elem[5],
                                  postcode=elem[6]))
             titles.append(f"{elem[3]}, {elem[4]} {elem[5]}")
         self.listWidget.clear()
@@ -59,7 +55,8 @@ class GeocoderView(QMainWindow):
         if self.selected_item_index is None:
             return
         address_info = self.addresses[self.selected_item_index]
-        self.fill_outputs(address_info.lat, address_info.lon, address_info.city, address_info.street,
+        self.fill_outputs(address_info.lat, address_info.lon, address_info.city,
+                          address_info.street,
                           address_info.house, address_info.postcode)
 
     def fill_outputs(self, latitude, longitude, city, street, building, index):
@@ -74,11 +71,17 @@ class GeocoderView(QMainWindow):
         self.selected_item_index = self.listWidget.currentRow()
 
 
-if __name__ == '__main__':
+def show_message_box(title, description, error_type):
+    msg = QMessageBox()
+    msg.setWindowTitle(title)
+    msg.setText(description)
+    msg.setIcon(error_type)
+
+    msg.exec_()
+
+
+def run():
     app = QApplication(sys.argv)
     geocoder = GeocoderView()
-    db = DB.DataBase([settings.GEO_TABLE, settings.CITY_TABLE,
-                      settings.STREET_TABLE])
-    parser = GeoParser(db)
     geocoder.show()
     sys.exit(app.exec())

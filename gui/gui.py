@@ -55,7 +55,8 @@ class GeocoderView(QMainWindow):
         if self.selected_item_index is None:
             return
         address_info = self.addresses[self.selected_item_index]
-        self.fill_outputs(address_info.lat, address_info.lon, address_info.city,
+        self.fill_outputs(address_info.lat, address_info.lon,
+                          address_info.city,
                           address_info.street,
                           address_info.house, address_info.postcode)
 

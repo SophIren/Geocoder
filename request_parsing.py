@@ -19,7 +19,7 @@ class GeoParser:
 
         for street in streets:
             for word in re.split("[/. ]", street[0]):
-                if word and word[0].islower(): # This is bad
+                if word and word[0].islower():  # This is bad
                     street_kinds.add(word)
 
         return street_kinds
@@ -59,10 +59,9 @@ class GeoParser:
         return list(self.db.filter_by_values(settings.GEO_TABLE, values))
         # sort by street kind (if specified) and housenumber
 
-
-if __name__ == "__main__":
-    db = DB.DataBase([settings.GEO_TABLE, settings.CITY_TABLE,
-                      settings.STREET_TABLE])
-    parser = GeoParser(db)
-
-    print(*parser.parse("Екатеринбург Тургенева 4"), sep='\n')
+# if __name__ == "__main__":
+#     db = DB.DataBase([settings.GEO_TABLE, settings.CITY_TABLE,
+#                       settings.STREET_TABLE])
+#     parser = GeoParser(db)
+#
+#     print(*parser.parse("Екатеринбург Тургенева 4"), sep='\n')

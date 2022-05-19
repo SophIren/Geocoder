@@ -45,7 +45,7 @@ class DataBase:
         """ Добавление записи в таблицу """
 
         query = f"""INSERT OR REPLACE INTO {table.name} 
-        VALUES({"?, " * (table.param_number)}?)"""
+        VALUES({"?, " * table.param_number}?)"""
 
         self.cursor.executemany(query, entries)
         self.conn.commit()

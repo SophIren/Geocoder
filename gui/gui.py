@@ -26,9 +26,9 @@ class GeocoderView(QMainWindow):
 
     def keyPressEvent(self, e):
         if e.key() in [QtCore.Qt.Key_Enter, QtCore.Qt.Key_Return]:
-            self.find()
+            self.find_toponym()
 
-    def find(self):
+    def find_toponym(self):
         address = self.address_entry.text()
         if address == "":
             return

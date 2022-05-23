@@ -4,12 +4,12 @@ from database_scripts.table import Table
 
 import os
 
-
 '''Supposing main.py is run'''
 LINKED_NODES_DATA_PATH = os.path.abspath('data/linked-nodes.osm.pbf')
 ADDRESSES_DATA_PATH = os.path.abspath('data/addresses.osm.pbf')
 DB_PATH = os.path.abspath("data/geodatabase.db")
 GUI_PATH = os.path.abspath("gui/geocoder.ui")
+ICON_PATH = os.path.abspath("gui/icon.png")
 
 GEO_TABLE_NAME = 'geo'
 CITY_TABLE_NAME = 'cities'

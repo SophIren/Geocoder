@@ -1,11 +1,13 @@
 import sys
 from PyQt5 import uic
+from PyQt5 import QtGui
 from PyQt5.QtWidgets import *
 from database_scripts import DB
 import settings
 from request_parsing import GeoParser
 from database_scripts.param_name_list import GeoParamNameList
 from PyQt5 import QtCore
+import ctypes
 
 
 class GeocoderView(QMainWindow):
@@ -17,6 +19,7 @@ class GeocoderView(QMainWindow):
                                settings.STREET_TABLE])
         self.parser = GeoParser(self.db)
 
+        self.setWindowIcon(QtGui.QIcon(settings.ICON_PATH))
         self.find_button.clicked.connect(self.find)
         self.choose_button.clicked.connect(self.choose_address)
         self.selected_item_index = None
@@ -82,7 +85,10 @@ def show_message_box(title, description, error_type):
 
 
 def run():
+    myappid = 'mycompany.myproduct.subproduct.version'
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
     app = QApplication(sys.argv)
+    app.setWindowIcon(QtGui.QIcon('icon.png'))
     geocoder = GeocoderView()
     geocoder.show()
     sys.exit(app.exec())

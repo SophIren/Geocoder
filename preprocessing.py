@@ -79,7 +79,8 @@ def main():
     db = DB.DataBase([settings.GEO_TABLE, settings.CITY_TABLE,
                       settings.STREET_TABLE])
     db.add_entries(settings.GEO_TABLE, address_handler.geo_entries)
-    fill_secondary_table(db, settings.GEO_PARAM_NAMES.city, settings.CITY_TABLE)
+    fill_secondary_table(db, settings.GEO_PARAM_NAMES.city,
+                         settings.CITY_TABLE)
     fill_secondary_table(db, settings.GEO_PARAM_NAMES.street,
                          settings.STREET_TABLE)
 

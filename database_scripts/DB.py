@@ -44,7 +44,7 @@ class DataBase:
     def add_entries(self, table: Table, entries: List[tuple]):
         """ Добавление записи в таблицу """
 
-        query = f"""INSERT OR REPLACE INTO {table.name} 
+        query = f"""INSERT OR REPLACE INTO {table.name}
         VALUES({"?, " * table.param_number}?)"""
 
         self.cursor.executemany(query, entries)

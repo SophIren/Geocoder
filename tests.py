@@ -13,7 +13,8 @@ class TestSum(unittest.TestCase):
 
     def test_len_simple_address(self):
         print(self.parser.parse("Екатеринбург Тургенева 4"))
-        self.assertEqual(len(self.parser.parse("Екатеринбург Тургенева 4")), 2, "Should be 2")
+        self.assertEqual(len(self.parser.parse("Екатеринбург Тургенева 4")),
+                         2, "Should be 2")
 
 
 if __name__ == '__main__':

@@ -31,7 +31,8 @@ class GeoParser:
                             occurrences_dict[elem] += 1
             else:
                 occurrences_dict[elem] = 1
-        occurrences_dict = dict(sorted(occurrences_dict.items(), key=lambda item: item[1], reverse=True))
+        occurrences_dict = dict(sorted(occurrences_dict.items(),
+                                       key=lambda item: item[1], reverse=True))
         i = occurrences_dict[list(occurrences_dict.keys())[0]]
 
         variations = []

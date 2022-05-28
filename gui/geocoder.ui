@@ -94,7 +94,7 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="0" colspan="2">
+     <item row="4" column="0" colspan="3">
       <layout class="QFormLayout" name="Data">
        <property name="sizeConstraint">
         <enum>QLayout::SetDefaultConstraint</enum>

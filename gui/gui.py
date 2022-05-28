@@ -20,7 +20,7 @@ class GeocoderView(QMainWindow):
         self.parser = GeoParser(self.db)
 
         self.setWindowIcon(QtGui.QIcon(settings.ICON_PATH))
-        self.find_button.clicked.connect(self.find)
+        self.find_button.clicked.connect(self.find_toponym)
         self.choose_button.clicked.connect(self.choose_address)
         self.selected_item_index = None
         self.listWidget.itemSelectionChanged.connect(self.selection_changed)

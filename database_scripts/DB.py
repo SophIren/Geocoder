@@ -15,15 +15,6 @@ class DataBase:
         for table in tables:
             self.create_table(table)
 
-    def close(self):
-        """ Разрывает соединение с БД """
-
-        if self.cursor is not None:
-            self.cursor.close()
-
-        if self.conn is not None:
-            self.conn.close()
-
     def create_table(self, table: Table):
         """ Создание таблицы """
 
@@ -59,16 +50,12 @@ class DataBase:
 
         return self.cursor.execute(query).fetchall()
 
-    def filter_by_values(self, table: Table, values: Dict[str, str],
-                         ignore_case=True):
+    def get_similar_entries(self, table: Table, values: Dict[str, str]):
         query = f"SELECT * FROM {table.name} WHERE "
 
         param_queries = []
         for param_name in values:
             param_query = f"{param_name} LIKE '%{values[param_name]}%'"
-            if ignore_case:
-                param_query = f"LOWER({param_name}) LIKE " \
-                              f"LOWER('%{values[param_name]}%')"
             param_queries.append(param_query)
         query += ' AND '.join(param_queries)
 

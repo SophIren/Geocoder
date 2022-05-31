@@ -57,8 +57,13 @@ class GeoParser:
             if token.lower() in self.street_kinds:
                 tokens.remove(token)
 
+    @staticmethod
+    def to_normal_case(token: str):
+        token = token.lower()
+        return token[0].upper() + token[1:]
+
     def parse(self, line: str):
-        tokens = re.split("[;,. ]", line)
+        tokens = list(map(self.to_normal_case, re.split("[;,. ]", line)))
 
         city = None
         street = None
@@ -78,7 +83,7 @@ class GeoParser:
         while not city:
             token = tokens[index]
             try:
-                cities = self.db.filter_by_values(settings.CITY_TABLE, {
+                cities = self.db.get_similar_entries(settings.CITY_TABLE, {
                     settings.GEO_PARAM_NAMES.city: token})
                 city = self.return_most_suitable(cities, tokens)
             except IndexError:
@@ -92,9 +97,10 @@ class GeoParser:
             else:
                 index += 1
         for token in tokens:
+            token = token
             if street is None:
                 try:
-                    streets = self.db.filter_by_values(settings.STREET_TABLE, {
+                    streets = self.db.get_similar_entries(settings.STREET_TABLE, {
                         settings.GEO_PARAM_NAMES.street: token})
                     street = self.return_most_suitable(streets, tokens)
                 except IndexError:
@@ -110,7 +116,7 @@ class GeoParser:
             settings.GEO_PARAM_NAMES.street: street,
             settings.GEO_PARAM_NAMES.house: house
         }
-        return list(self.db.filter_by_values(settings.GEO_TABLE, values))
+        return list(self.db.get_similar_entries(settings.GEO_TABLE, values))
         # sort by street kind (if specified) and housenumber
 
 # if __name__ == "__main__":

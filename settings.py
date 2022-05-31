@@ -12,6 +12,8 @@ GUI_PATH = os.path.abspath("gui/geocoder.ui")
 ICON_PATH = os.path.abspath("gui/icon.png")
 STREET_KINDS_PATH = os.path.abspath("data/street_kinds.txt")
 
+TEST_DB_NAME = '_test.db'
+
 GEO_TABLE_NAME = 'geo'
 CITY_TABLE_NAME = 'cities'
 STREETS_TABLE_NAME = 'streets'

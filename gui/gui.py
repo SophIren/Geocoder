@@ -85,8 +85,8 @@ def show_message_box(title, description, error_type):
 
 
 def run():
-    myappid = 'mycompany.myproduct.subproduct.version'
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+    # myappid = 'mycompany.myproduct.subproduct.version'
+    # ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
     app = QApplication(sys.argv)
     app.setWindowIcon(QtGui.QIcon('icon.png'))
     geocoder = GeocoderView()

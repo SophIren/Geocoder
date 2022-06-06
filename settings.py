@@ -5,12 +5,13 @@ from database_scripts.table import Table
 import os
 
 '''Supposing main.py is run'''
-LINKED_NODES_DATA_PATH = os.path.abspath('data/linked-nodes.osm.pbf')
-ADDRESSES_DATA_PATH = os.path.abspath('data/addresses.osm.pbf')
-DB_PATH = os.path.abspath("data/geodatabase.db")
-GUI_PATH = os.path.abspath("gui/geocoder.ui")
-ICON_PATH = os.path.abspath("gui/icon.png")
-STREET_KINDS_PATH = os.path.abspath("data/street_kinds.txt")
+SETTINGS_PATH = os.path.dirname(__file__)
+LINKED_NODES_DATA_PATH = os.path.abspath(os.path.join(SETTINGS_PATH, 'data/linked-nodes.osm.pbf'))
+ADDRESSES_DATA_PATH = os.path.abspath(os.path.join(SETTINGS_PATH, 'data/addresses.osm.pbf'))
+DB_PATH = os.path.abspath(os.path.join(SETTINGS_PATH, "data/geodatabase.db"))
+GUI_PATH = os.path.abspath(os.path.join(SETTINGS_PATH, "gui/geocoder.ui"))
+ICON_PATH = os.path.abspath(os.path.join(SETTINGS_PATH, "gui/icon.png"))
+STREET_KINDS_PATH = os.path.abspath(os.path.join(SETTINGS_PATH, "data/street_kinds.txt"))
 
 TEST_DB_NAME = '_test.db'
 

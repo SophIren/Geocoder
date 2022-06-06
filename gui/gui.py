@@ -7,7 +7,6 @@ import settings
 from app.request_parsing import GeoParser
 from database_scripts.param_name_list import GeoParamNameList
 from PyQt5 import QtCore
-import ctypes
 
 
 class GeocoderView(QMainWindow):

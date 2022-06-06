@@ -2,7 +2,7 @@ import unittest
 
 from database_scripts import DB
 import settings
-from request_parsing import GeoParser
+from app.request_parsing import GeoParser
 
 
 class TestSum(unittest.TestCase):

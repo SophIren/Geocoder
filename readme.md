@@ -30,9 +30,11 @@ ___
 -`gui`
   - `gui.py` скрипт логики графической оболочки
   - `geocoder.ui` PyQt файл gui приложения
-- `main.py` скрипт запуска приложения (с gui)
-- `preprocessing.py` подготова БД из сырых OSM данных
-- `request_parsing.py` парсинг запросов пользователя   
+- `app`
+  - `__main__.py` скрипт запуска приложения (с gui)
+  - `request_parsing.py` парсинг запросов пользователя
+  - `company_finder.py` поиск организаций из результата request_parsing.py с yandex-search api
+- `preprocessing.py` подготовка БД из сырых OSM данных
 - `settings.py` все настройки проекта (пути, названия таблиц и пр.)
 ___
 ### Извлечение БД

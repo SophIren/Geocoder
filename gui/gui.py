@@ -4,7 +4,7 @@ from PyQt5 import QtGui
 from PyQt5.QtWidgets import *
 from database_scripts import DB
 import settings
-from request_parsing import GeoParser
+from app.request_parsing import GeoParser
 from database_scripts.param_name_list import GeoParamNameList
 from PyQt5 import QtCore
 import ctypes

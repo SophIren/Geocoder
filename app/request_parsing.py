@@ -6,6 +6,7 @@ import settings
 
 class GeoParser:
     def __init__(self, db: DB.DataBase):
+        self.has_additional_word = None
         self.db = db
         self.street_kinds = self.extract_street_kinds()
 
@@ -56,6 +57,7 @@ class GeoParser:
         for token in tokens:
             if token.lower() in self.street_kinds or token == "":
                 tokens.remove(token)
+                self.has_additional_word = True
 
     @staticmethod
     def to_normal_case(token: str):
@@ -84,6 +86,7 @@ class GeoParser:
         house = None
 
         tokens = tokens_with_additional_words.copy()
+        self.has_additional_word = False
         self.remove_additional_words(tokens)
 
         for i in range(len(tokens), 0, -1):
@@ -128,8 +131,10 @@ class GeoParser:
                     street = self.return_most_suitable(streets, tokens_with_additional_words)
                 except IndexError:
                     pass
-                if street:
-                    break
+                if street and not self.has_additional_word:
+                    street_words = street.split()
+                    self.remove_additional_words(street_words)
+                    street = ' '.join(street_words)
 
         if city is None or street is None:
             raise IndexError

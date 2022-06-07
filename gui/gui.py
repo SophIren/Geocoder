@@ -7,6 +7,7 @@ import settings
 from app.request_parsing import GeoParser
 from database_scripts.param_name_list import GeoParamNameList
 from PyQt5 import QtCore
+from app.company_finder import get_company_names
 
 
 class GeocoderView(QMainWindow):
@@ -69,6 +70,8 @@ class GeocoderView(QMainWindow):
         self.street_output.setText(street)
         self.building_output.setText(building)
         self.index_output.setText(str(index))
+        self.listWidget_2.clear()
+        self.listWidget_2.addItems(get_company_names(f"{city} {street} {building}"))
 
     def selection_changed(self):
         self.selected_item_index = self.listWidget.currentRow()

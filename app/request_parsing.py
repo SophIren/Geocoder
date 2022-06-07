@@ -48,9 +48,11 @@ class GeoParser:
         else:
             min_dif = 100
             for elem in variations:
-                if min_dif > abs(len(re.split("[;,./ ]", elem)) - max_matches_count):
+                if min_dif > abs(len(re.split("[;,./ ]", elem))
+                                 - max_matches_count):
                     res = elem
-                    min_dif = abs(len(re.split("[;,./ ]", elem)) - max_matches_count)
+                    min_dif = abs(len(re.split("[;,./ ]", elem))
+                                  - max_matches_count)
         return res
 
     def remove_additional_words(self, tokens):
@@ -79,7 +81,8 @@ class GeoParser:
             return token
 
     def parse(self, line: str):
-        tokens_with_additional_words = list(map(self.to_normal_case, re.split("[;,. ]", line)))
+        tokens_with_additional_words = list(map(self.to_normal_case,
+                                                re.split("[;,. ]", line)))
 
         city = None
         street = None
@@ -104,7 +107,8 @@ class GeoParser:
             try:
                 cities = self.db.get_similar_entries(settings.CITY_TABLE, {
                     settings.GEO_PARAM_NAMES.city: token})
-                city = self.return_most_suitable(cities, tokens_with_additional_words)
+                city = self.return_most_suitable(cities,
+                                                 tokens_with_additional_words)
             except IndexError:
                 pass
             if city:
@@ -126,9 +130,11 @@ class GeoParser:
             token = token
             if street is None:
                 try:
-                    streets = self.db.get_similar_entries(settings.STREET_TABLE, {
-                        settings.GEO_PARAM_NAMES.street: token})
-                    street = self.return_most_suitable(streets, tokens_with_additional_words)
+                    streets = \
+                        self.db.get_similar_entries(settings.STREET_TABLE, {
+                            settings.GEO_PARAM_NAMES.street: token})
+                    street = self.return_most_suitable(
+                        streets, tokens_with_additional_words)
                 except IndexError:
                     pass
                 if street and not self.has_additional_word:

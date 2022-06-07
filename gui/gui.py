@@ -71,7 +71,8 @@ class GeocoderView(QMainWindow):
         self.building_output.setText(building)
         self.index_output.setText(str(index))
         self.listWidget_2.clear()
-        self.listWidget_2.addItems(get_company_names(f"{city} {street} {building}"))
+        self.listWidget_2.addItems(
+            get_company_names(f"{city} {street} {building}"))
 
     def selection_changed(self):
         self.selected_item_index = self.listWidget.currentRow()

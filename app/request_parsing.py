@@ -56,10 +56,14 @@ class GeoParser:
         return res
 
     def remove_additional_words(self, tokens):
-        for token in tokens:
-            if token.lower() in self.street_kinds or token == "":
-                tokens.remove(token)
+        index = 0
+        while index != len(tokens):
+            if tokens[index].lower() in self.street_kinds or \
+                    tokens[index] == "":
+                tokens.remove(tokens[index])
                 self.has_additional_word = True
+            else:
+                index += 1
 
     @staticmethod
     def to_normal_case(token: str):

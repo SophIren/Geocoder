@@ -5,7 +5,7 @@ import settings
 from app.request_parsing import GeoParser
 
 
-class TestSum(unittest.TestCase):
+class TestParser(unittest.TestCase):
     def setUp(self):
         self.db = DB.DataBase([settings.GEO_TABLE, settings.CITY_TABLE,
                                settings.STREET_TABLE])

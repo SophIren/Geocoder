@@ -1,10 +1,12 @@
 import re
-from typing import Set
+from typing import Set, List
 from database_scripts import DB
 import settings
 
 
 class GeoParser:
+    PREPOSITION_WORDS = ['на', 'я', 'й', 'летия']
+
     def __init__(self, db: DB.DataBase):
         self.has_additional_word = None
         self.db = db
@@ -17,49 +19,53 @@ class GeoParser:
         return set(street_kinds)
 
     @staticmethod
-    def return_most_suitable(a, tokens_with_additional_words):
-        res = ''
+    def get_token_occurrences(toponym, tokens_with_additional_words):
         lower_tokens = [elem.lower() for elem in tokens_with_additional_words]
-        occurrences_dict = {}
-        for elem in a:
+        occurrences = {}
+        for elem in toponym:
             words = elem[1].split()
             if len(words) > 1:
                 for word in words:
                     if word.lower() in lower_tokens:
-                        if elem not in occurrences_dict:
-                            occurrences_dict[elem] = 1
+                        if elem not in occurrences:
+                            occurrences[elem] = 1
                         else:
-                            occurrences_dict[elem] += 1
+                            occurrences[elem] += 1
             else:
-                occurrences_dict[elem] = 1
-        occurrences_dict = dict(sorted(occurrences_dict.items(),
-                                       key=lambda item: item[1], reverse=True))
+                occurrences[elem] = 1
+        return dict(sorted(occurrences.items(),
+                           key=lambda item: item[1], reverse=True))
+
+    @staticmethod
+    def return_most_suitable(toponym, tokens_with_additional_words):
+        res = ''
+        occurrences_dict = GeoParser.get_token_occurrences(
+            toponym,
+            tokens_with_additional_words)
         max_matches_count = occurrences_dict[list(occurrences_dict.keys())[0]]
 
         variations = []
         for elem in occurrences_dict:
             if occurrences_dict[elem] < max_matches_count:
                 break
-            else:
-                variations.append(elem[1])
+            variations.append(elem[1])
 
         if len(variations) == 1:
-            res = variations[0]
-        else:
-            min_dif = 100
-            for elem in variations:
-                if min_dif > abs(len(re.split("[;,./ ]", elem))
-                                 - max_matches_count):
-                    res = elem
-                    min_dif = abs(len(re.split("[;,./ ]", elem))
-                                  - max_matches_count)
+            return variations[0]
+
+        min_dif = 1000
+        for variation in variations:
+            variation_len = len(re.split("[;,./ ]", variation))
+            if min_dif > abs(variation_len - max_matches_count):
+                res = variation
+                min_dif = abs(variation_len - max_matches_count)
         return res
 
     def remove_additional_words(self, tokens):
         index = 0
+        self.has_additional_word = False
         while index != len(tokens):
-            if tokens[index].lower() in self.street_kinds or \
-                    tokens[index] == "":
+            if not tokens[index] or tokens[index].lower() in self.street_kinds:
                 tokens.remove(tokens[index])
                 self.has_additional_word = True
             else:
@@ -72,11 +78,12 @@ class GeoParser:
         if "-" in token:
             res = []
             for elem in token.split("-"):
-                if elem not in ['на', 'я', 'й', 'летия']:
+                if elem not in GeoParser.PREPOSITION_WORDS:
                     res.append(elem[0].upper() + elem[1:])
                 else:
                     res.append(elem)
             return "-".join(res)
+
         try:
             if not token[index].isalpha():
                 return token[0] + token[1].upper() + token[2:]
@@ -84,67 +91,74 @@ class GeoParser:
         except IndexError:
             return token
 
-    def parse(self, line: str):
-        tokens_with_additional_words = list(map(self.to_normal_case,
-                                                re.split("[;,. ]", line)))
+    @staticmethod
+    def extract_building(tokens: List[str]):
+        house_tokens = []
+        while not tokens[-1][0].isdigit():
+            house_tokens.append(tokens.pop())
 
-        city = None
-        street = None
-        house = None
+        house_tokens.append(tokens.pop())
+        return ' '.join(house_tokens)
 
-        tokens = tokens_with_additional_words.copy()
-        self.has_additional_word = False
-        self.remove_additional_words(tokens)
-
-        for i in range(len(tokens), 0, -1):
-            if tokens[i - 1][0].isdigit():
-                house = ' '.join(tokens[i - 1:])
-                tokens = tokens[:i - 1]
-                break
-        if not house:
-            # raise IndexError
-            pass
-
+    def extract_city(self, tokens: List[str], tokens_with_additional_words):
         index = 0
+        city = None
         while not city:
             token = tokens[index]
             try:
-                cities = self.db.get_similar_entries(settings.CITY_TABLE, {
-                    settings.GEO_PARAM_NAMES.city: token})
-                city = self.return_most_suitable(cities,
-                                                 tokens_with_additional_words)
+                cities = self.db.get_similar_entries(
+                    settings.CITY_TABLE, {settings.GEO_PARAM_NAMES.city: token})
+                city = self.return_most_suitable(
+                    cities, tokens_with_additional_words)
             except IndexError:
                 pass
-            if city:
-                for elem in city.split():
-                    try:
-                        tokens.remove(elem)
-                        tokens_with_additional_words.remove(elem)
-                    except ValueError:
-                        pass
-            else:
-                index += 1
 
-        if not tokens:
-            tokens.extend(house.split())
-            tokens_with_additional_words.extend(house.split())
-            house = None
+            index += 1
 
+        for elem in city.split():
+            try:
+                tokens.remove(elem)
+                tokens_with_additional_words.remove(elem)
+            except ValueError:
+                pass
+
+        return city
+
+    def extract_street(self, tokens: List[str], tokens_with_additional_words):
+        street = None
         for token in tokens:
-            token = token
             if street is None:
                 try:
-                    streets = \
-                        self.db.get_similar_entries(settings.STREET_TABLE, {
-                            settings.GEO_PARAM_NAMES.street: token})
+                    streets = self.db.get_similar_entries(
+                        settings.STREET_TABLE,
+                        {settings.GEO_PARAM_NAMES.street: token})
                     street = self.return_most_suitable(
-                        streets, tokens_with_additional_words)
+                        streets,
+                        tokens_with_additional_words)
                 except IndexError:
                     pass
                 if street and not self.has_additional_word:
                     street_words = street.split()
                     self.remove_additional_words(street_words)
                     street = ' '.join(street_words)
+
+        return street
+
+    def parse(self, line: str):
+        line = re.split("[;,. ]", line)
+
+        tokens_with_additional_words = list(map(self.to_normal_case, line))
+
+        tokens = list(map(self.to_normal_case, line))
+        self.remove_additional_words(tokens)
+
+        house = GeoParser.extract_building(tokens)
+        city = self.extract_city(tokens, tokens_with_additional_words)
+        if not tokens:
+            tokens.extend(house.split())
+            tokens_with_additional_words.extend(house.split())
+            house = None
+        street = self.extract_street(tokens, tokens_with_additional_words)
 
         if city is None or street is None:
             raise IndexError
@@ -155,12 +169,5 @@ class GeoParser:
         }
         if house:
             values[settings.GEO_PARAM_NAMES.house] = house
-        return list(self.db.get_similar_entries(settings.GEO_TABLE, values))
-        # sort by street kind (if specified) and housenumber
 
-# if __name__ == "__main__":
-#     db = DB.DataBase([settings.GEO_TABLE, settings.CITY_TABLE,
-#                       settings.STREET_TABLE])
-#     parser = GeoParser(db)
-#
-#     print(*parser.parse("Екатеринбург Тургенева 4"), sep='\n')
+        return list(self.db.get_similar_entries(settings.GEO_TABLE, values))

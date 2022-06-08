@@ -13,7 +13,7 @@ DB_PATH = os.path.abspath(os.path.join(SETTINGS_PATH, "data/geodatabase.db"))
 GUI_PATH = os.path.abspath(os.path.join(SETTINGS_PATH, "gui/geocoder.ui"))
 ICON_PATH = os.path.abspath(os.path.join(SETTINGS_PATH, "gui/icon.png"))
 STREET_KINDS_PATH = os.path.abspath(
-    os.path.join(SETTINGS_PATH, "data/street_kinds.txt"))
+    os.path.join(SETTINGS_PATH, "data/toponym_kinds.txt"))
 
 SEARCH_COMPANY_API_SERVER = "https://search-maps.yandex.ru/v1/"
 API_KEY = 'dda3ddba-c9ea-4ead-9010-f43fbc15c6e3'

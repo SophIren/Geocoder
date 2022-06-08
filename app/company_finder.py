@@ -27,4 +27,4 @@ def get_company_names(query):
 
 
 if __name__ == "__main__":
-    print(get_company_names('Екатеринбург Тургенева 4'))
+    print(get_company_names('Екатеринбург улица Чекистов 5'))

@@ -71,6 +71,9 @@ class GeocoderView(QMainWindow):
         self.building_output.setText(building)
         self.index_output.setText(str(index))
         self.listWidget_2.clear()
+        tokens = street.split()
+        self.parser.remove_additional_words(tokens)
+        street = " ".join(tokens)
         self.listWidget_2.addItems(
             get_company_names(f"{city} {street} {building}"))
 

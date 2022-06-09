@@ -72,10 +72,10 @@ class GeoParser:
         index = 0
         self.has_additional_word = False
         while index != len(tokens):
-            if not tokens[index] or tokens[index].lower() in self.street_kinds:
+            if tokens[index].lower() in self.street_kinds:
                 tokens.remove(tokens[index])
                 self.has_additional_word = True
-            elif tokens[index].lower() in self.city_kinds:
+            elif not tokens[index] or tokens[index].lower() in self.city_kinds:
                 tokens.remove(tokens[index])
             else:
                 index += 1

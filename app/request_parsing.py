@@ -11,12 +11,19 @@ class GeoParser:
         self.has_additional_word = None
         self.db = db
         self.street_kinds = self.extract_street_kinds()
+        self.city_kinds = self.extract_city_kinds()
 
     @staticmethod
     def extract_street_kinds() -> Set[str]:
         with open(settings.STREET_KINDS_PATH, 'r', encoding='utf-8') as f:
             street_kinds = [line.strip() for line in f.readlines()]
         return set(street_kinds)
+
+    @staticmethod
+    def extract_city_kinds() -> Set[str]:
+        with open(settings.CITY_KINDS_PATH, 'r', encoding='utf-8') as f:
+            city_kinds = [line.strip() for line in f.readlines()]
+        return set(city_kinds)
 
     @staticmethod
     def get_token_occurrences(toponym, tokens_with_additional_words):
@@ -68,6 +75,8 @@ class GeoParser:
             if not tokens[index] or tokens[index].lower() in self.street_kinds:
                 tokens.remove(tokens[index])
                 self.has_additional_word = True
+            elif tokens[index].lower() in self.city_kinds:
+                tokens.remove(tokens[index])
             else:
                 index += 1
 

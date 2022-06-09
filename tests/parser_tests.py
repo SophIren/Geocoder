@@ -20,7 +20,7 @@ class TestParser(unittest.TestCase):
                          self.parser.parse("Тургенева Екатеринбург 4"))
 
     def test_many_words_city(self):
-        self.assertEqual(self.parser.parse("Великий Новгород Германа 19"),
+        self.assertEqual(self.parser.parse("город Великий Новгород Германа 19"),
                          [(288467214, 58.5306106,
                            31.2577717, 'Великий Новгород',
                            'улица Германа', '19', None),
